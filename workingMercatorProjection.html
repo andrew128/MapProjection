@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<head>
+	<title>Mercator Projection</title>
+	<script src="//d3js.org/d3.v3.min.js"></script>
+	<script src="//d3js.org/queue.v1.min.js"></script>
+	<script src="//d3js.org/topojson.v1.min.js"></script>
+	<style>
+		.graticule {
+		  fill: none;
+		  stroke: #777;
+		  stroke-opacity: .5;
+		  stroke-width: .5px;
+		}
+
+		#countries {
+		    fill: #b8b8b8;
+		    stroke: #fff;
+		    stroke-width: .5px;
+		    stroke-linejoin: round;
+		}			
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		var width=1000, height=700;
+		var traceRoutePath = ["Seattle", "New York", "London"];
+
+		var svg = d3.select("body").append("svg")
+		    .attr("width", width)
+		    .attr("height", height);
+
+		var projection = d3.geo.mercator()
+		    .scale((width + 1) / 2 / Math.PI)
+		    .translate([width / 2, height / 2])
+		    .precision(.1);
+		// var projection = d3.geo.mercator()
+		//     .center([0, 5 ])
+		//     .scale(200)
+		//     .rotate([-180,0]);
+
+		var path = d3.geo.path()
+		    .projection(projection);
+
+		//DOC: creating and appending graticule to svg element
+		var graticule = d3.geo.graticule();
+		svg.append("path")
+		    .datum(graticule)
+		    .attr("class", "graticule")
+		    .attr("d", path);
+
+		var g = svg.append("g");
+
+
+		d3.json("./world-110m.json", function(error, world){
+			if(error) throw error;
+			var countries = topojson.feature(world, world.objects.countries);
+
+			//DOC: adding lon and lat for circles representing cities
+			d3.csv("./cities.csv", function(error, cities){
+				if(error) throw error;
+
+				for(var i=0; i<cities.length; i++){
+					g.append("circle")
+			        .attr("cx", function() {
+			            //return projection([d.lon, d.lat])[0];
+			            //console.log(cities[i]["lat"])
+			            return cities[i]["lat"];
+			        })
+			        .attr("cy", function() {
+			            //return projection([d.lon, d.lat])[1];
+			            //console.log(cities[i]["lon"])
+			            return cities[i]["lon"];
+			        })
+			        .attr("r", 3)
+			        .style("fill", "red");
+			}
+
+			svg.append("path")
+				.datum(countries)
+				.attr("id", "countries")
+				.attr("d", path);
+
+			// g.selectAll("path")
+		 //      .data(topojson.feature(topology, topology.objects.countries)
+		 //          .geometries)
+		 //    .enter()
+		 //      .append("path")
+		 //      .attr("d", path)
+
+		});
+		})	
+
+	</script>
+</body>
+</html>

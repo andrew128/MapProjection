@@ -93,12 +93,17 @@
 		          svg.selectAll("path").attr("d", path)
 		        }));
 
+		function location_along_arc(start, end, loc{
+		    var interpolator = d3.geo.interpolate(start,end);
+		    return interpolator(loc)
+		}
+
 		function flyingArc(pts){
 			var source = pts.source, target = pts.target;
 			var mid = location_along_arc(source, target, .5);
-  			var result = [ proj(source),
+  			var result = [ projection(source),
                 sky(mid),
-                proj(target) ]
+                projection(target) ]
   		    return result;
 		}
 
