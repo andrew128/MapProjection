@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<head>
+<title>D3 Globe with GeoJSON Countries</title>
+<meta charset="utf-8">
+<style>
+#land {
+  fill: #b8b8b8;
+  stroke: #fff;
+  stroke-width: .5px;
+  stroke-linejoin: round;
+}
+
+.graticule {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .3;
+  stroke-width: .5px;
+}
+
+.graticule-outline {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+circle.mouse {
+  fill: none;
+  stroke: #000;
+  pointer-events: all;
+}
+</style>
+
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="//d3js.org/topojson.v1.min.js"></script>
+
+</head>
+<body>
+
+<h1>D3 Sphere Geo Projection: Orthographic</h1>
+
+<script>
+var width = 400,
+    height = 400;
+
+var projection = d3.geo.orthographic()
+    .translate([width / 2, height / 2])
+    .scale(200)
+    .rotate([98,-39])
+    .clipAngle(90);
+
+var path = d3.geo.path()
+    .projection(projection);
+
+var graticule = d3.geo.graticule();
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var line = svg.append("path")
+    .datum(graticule)
+    .attr("class", "graticule")
+    .attr("d", path);
+
+
+d3.json("world-110m.json", function(error, world) {
+
+  svg.append("path")
+      .datum(topojson.feature(world, world.objects.land))
+      .attr("id", "land")
+      .attr("d", path);
+
+  var latitude = d3.scale.linear()
+      .domain([0, width])
+      .range([-180, 180]);
+
+  var longitude = d3.scale.linear()
+      .domain([0, height])
+      .range([90, -90]);
+
+  svg.append("circle")
+      .datum({x: 0, y: 90})
+      .attr("class", "mouse")
+      .attr("cx", width / 2)
+      .attr("cy", height / 2)
+      .attr("r", projection.scale())
+      .call(d3.behavior.drag()
+        .origin(Object)
+        .on("drag", function(d) {
+          var p = d3.mouse(this);
+          projection.rotate([latitude(p[0]), longitude(p[1])]);
+          svg.selectAll("path").attr("d", path)
+        }));
+
+});
+</script>
+</body>
+</html>
