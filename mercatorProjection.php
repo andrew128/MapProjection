@@ -21,7 +21,7 @@
 	</style>
 </head>
 <body>
-	<h1>Mercator Projection with Cities</h1>
+	<h1>Visualization of Traceroute</h1>
 
 	<form method="POST">
 		Enter site url:
@@ -32,12 +32,18 @@
 	<?php
 		if($_SERVER["REQUEST_METHOD"] == "POST"){ 
 			$site = $_POST["site"];
-			//print $site;
 
-			//$command = escapeshellcmd("");
-			//$output = shell_exec($command);
+			// pass var into bash script
 
-			$listOfCities = array("Seattle", "New York", "London");
+			$command = escapeshellcmd("bash traceRoute.sh");
+			$output = shell_exec($command);
+			print $output;
+
+			// parse output from traceroute: find city based off of ip address
+
+			// get lat lon city stored in sql and write to traceRoutePath.csv
+
+
 			// //check each line in file to see if it contains city name, if it does parse and get lon lat vals
 			//$file = fopen("cities.csv", "r");
 			//print(fgetcsv($file)[0]);
@@ -124,9 +130,9 @@
 				console.log(data);
 
 				for(var i=0; i<data.length-1; i++){
-					console.log(data[i]["city"]);
-					console.log(projection([data[i].lon, data[i].lat])[0]);
-					console.log(projection([data[i].lon, data[i+1].lat])[0]);
+					// console.log(data[i]["city"]);
+					// console.log(projection([data[i].lon, data[i].lat])[0]);
+					// console.log(projection([data[i].lon, data[i+1].lat])[0]);
 					//console.log(projection([data[i].lon, data[i].lat])[0]);
 					//console.log(projection([data[i].lon, data[i].lat])[1]);
 					//svg.append("g")
